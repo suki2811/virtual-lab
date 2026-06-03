@@ -1,194 +1,78 @@
-# VIRTUAL-LAB
-VIRTUAL-LAB is a browser-based 2D physics simulation platform for creating, running, analyzing, and collaborating on mechanics experiments such as springs, ropes, pivots, collisions, forces, and velocity plots.
+# 🧪 Virtual Lab
+
+A browser-based 2D physics simulation platform for creating, running, analyzing, and collaborating on mechanics experiments. Build physical systems using springs, ropes, pivots, and rigid bodies, and observe their real-time physics behaviors.
 
 ---
 
-## How to Run This Project
-Follow these steps from scratch after downloading or cloning the project.
+## ✨ Key Features
+- **Interactive 2D Physics:** Real-time simulations of rigid bodies, collisions, gravity, friction, and restitution (bounciness).
+- **Constraints & Joints:** Connect objects using ropes, springs (with Hooke's Law), and pivot joints.
+- **Data & Analytics:** Record simulations and plot velocity, acceleration, and angular velocity graphs.
+- **Time Controls & Replay:** Pause, play, and scrub back in time to review motion frame-by-frame.
+- **Real-Time Collaboration:** Create rooms and build experiments together with others via WebSockets.
+- **Cloud Saves:** Save and load experiments using MongoDB.
 
-### 1. Install Requirements
-Install these tools first:
-- Node.js
-- npm
-- Git
+---
 
-Check that they are installed:
+## 🚀 Quick Start Workflow
+
+Follow these simple steps to get the project running locally.
+
+### 1. Prerequisites
+Ensure you have the following installed on your machine:
+- [Node.js](https://nodejs.org/) (v16+)
+- [Git](https://git-scm.com/)
+
+### 2. Clone the Repository
 ```bash
-node --version
-npm --version
-git --version
-```
-
-If these commands show version numbers, the system is ready.
-
-### 2. Get the Project Files
-If you are using GitHub, clone the repository:
-```bash
-git clone https://github.com/your-username/virtual-lab.git
+git clone https://github.com/suki2811/virtual-lab.git
 cd virtual-lab
 ```
 
-If you downloaded the project as a ZIP file, extract it first. Then open a terminal inside the extracted project folder.
-
-The terminal should be inside the folder that contains `package.json`.
-
-### 3. Install Project Dependencies
-Run:
+### 3. Install Dependencies
 ```bash
 npm install
 ```
 
-This installs React, Vite, Matter.js, Socket.IO, Express, MongoDB dependencies, and all other required packages.
-
-### 4. Configure MongoDB for Saved Experiments
-Create a `.env` file in the project root folder:
+### 4. Setup Environment Variables
+Create a `.env` file in the root folder with the following configuration:
 ```env
 VITE_SOCKET_URL=http://localhost:3001
 VITE_API_URL=http://localhost:3001
+# Local MongoDB (Or use an Atlas connection string)
 MONGODB_URI=mongodb://127.0.0.1:27017/virtual-lab
 ```
+> **Note:** If you don't configure MongoDB, the backend will still work but will save experiments in temporary memory instead of a database.
 
-Use a MongoDB Atlas connection string instead of the local URI if you are using Atlas.
+### 5. Run the Application (Frontend & Backend)
+You'll need two terminal windows open to run both the frontend UI and the backend server simultaneously.
 
-MongoDB is only required for permanent saved experiments. If `MONGODB_URI` is not configured, the backend still runs, but saved experiments use temporary memory storage.
-
-### 5. Start the Frontend
-In the project folder, run:
-```bash
-npm run dev
-```
-
-The frontend starts with Vite. Open the URL shown in the terminal, usually:
-```text
-http://localhost:5173
-```
-
-### 6. Start the Backend for Collaboration and Saving
-Open a second terminal in the same project folder and run:
+**Terminal 1 (Backend Server):**
 ```bash
 node server/index.js
 ```
+*(Server runs on `http://localhost:3001`)*
 
-The backend starts the Express API and Socket.IO collaboration server at:
-```text
-http://localhost:3001
+**Terminal 2 (Frontend Client):**
+```bash
+npm run dev
 ```
+*(App runs on `http://localhost:5173`)*
 
-### 7. Use the App
-Keep both terminals running:
-- Terminal 1: frontend with `npm run dev`
-- Terminal 2: backend with `node server/index.js`
-
-Then use the browser app to create simulations, save experiments, load experiments, and join collaboration rooms.
+Open `http://localhost:5173` in your browser to start experimenting!
 
 ---
 
-## Project Structure
-```text
-VIRTUAL-LAB/
-|-- src/
-|   |-- components/        React UI components
-|   |-- hooks/             Physics and WebSocket hooks
-|   |-- physics/           Engine, bodies, constraints, forces
-|   |-- types/             TypeScript type definitions
-|   |-- utils/             Helper utilities
-|   |-- App.tsx            Main application component
-|   |-- main.tsx           React entry point
-|   `-- index.css          Global styles
-|-- server/
-|   `-- index.js           Express and Socket.IO backend
-|-- index.html             HTML entry file
-|-- package.json           Scripts and dependencies
-|-- package-lock.json      Exact dependency versions
-|-- tsconfig.json          TypeScript configuration
-|-- vite.config.ts         Vite configuration
-|-- .env.example           Example environment file
-|-- .gitignore             Git ignored files
-`-- README.md              Project documentation
-```
+## 🛠️ Tech Stack & Architecture
 
----
+- **Frontend:** React, Vite, TypeScript, TailwindCSS
+- **Physics Engine:** Matter.js (handles rigid-body motion, collisions, and constraint solving)
+- **Backend Server:** Node.js, Express.js
+- **Real-time Collaboration:** Socket.IO
+- **Database:** MongoDB (via Mongoose)
 
-## Complete Project Explanation
-
-### 1. Application Start
-The app starts from `src/main.tsx`. This file loads React and renders the main `App.tsx` component into the browser.
-
-### 2. Main App File
-`src/App.tsx` connects the toolbar, canvas, side panel, room manager, experiment library, velocity plotting modal, and physics hook.
-
-### 3. Physics System
-The main simulation logic is inside `src/hooks/usePhysics2.ts`. It manages bodies, constraints, selected objects, play/pause state, replay snapshots, and velocity plot data.
-
-### 4. Physics Engine
-`src/physics/engine.ts` creates the Matter.js engine. Matter.js handles rigid-body motion, collision detection, collision response, and constraint solving.
-
-### 5. Simulation Loop
-`src/physics/world.ts` runs the engine using a fixed timestep. This keeps physics updates stable and consistent.
-
-### 6. Creating Objects
-When the user clicks Box, Circle, or Ground, the app creates a preview object. After placement, it becomes a real Matter.js body.
-
-### 7. Body Factory
-`src/physics/bodies/factory.ts` converts project objects into Matter.js bodies with shape, size, mass, friction, restitution, static state, and render properties.
-
-### 8. Creating Constraints
-Ropes, springs, and pivots connect two bodies. The user selects objects on the canvas, and the project creates a constraint between them.
-
-### 9. Constraint Factory
-`src/physics/constraints/factory.ts` creates rope, spring, and pivot constraints. It stores rope length, max tension, spring natural length, spring constant, and damping.
-
-### 10. Spring Motion
-Springs follow Hooke's law:
-```text
-F = -k(x - L0)
-```
-This allows horizontal or vertical simple harmonic motion when damping is zero.
-
-### 11. Rope Motion
-Ropes pull when stretched but do not push when slack. The project can also calculate and display rope tension.
-
-### 12. Forces and Gravity
-The simulation supports gravity, mass, friction, restitution, external force, velocity control, and air resistance. These values are edited from the right-side panel.
-
-### 13. Collisions
-Matter.js detects collisions between bodies. Restitution controls bounce, and friction controls resistance during contact.
-
-### 14. Play and Pause
-When Start is clicked, bodies move and simulation time begins. When Pause is clicked, the simulation stops and properties can be inspected or edited.
-
-### 15. Replay System
-During simulation, the app records positions, velocities, angles, and angular velocities. The replay slider can scrub through saved states.
-
-### 16. Velocity Plotting
-From Start until Pause, the app records each body's time, velocity magnitude, `Vx`, `Vy`, angular velocity, and acceleration. After pausing, velocity plots can be opened.
-
-### 17. Real-Time Collaboration
-`server/index.js` runs an Express and Socket.IO server. Users can join rooms, create objects, create constraints, and receive live updates.
-
-### 18. Saving Experiments
-Saved experiments are stored through backend API endpoints in `server/index.js`:
-```text
-GET    /api/experiments
-POST   /api/experiments
-DELETE /api/experiments/:id
-```
-When `MONGODB_URI` is configured, experiments are saved in MongoDB. If it is missing, the backend uses temporary memory storage for development only.
-
-### 19. WebSocket Communication
-`src/hooks/useWebSocket.ts` sends and receives room events, object events, constraint events, and physics updates between frontend and backend.
-
-### 20. Data Flow
-```text
-User action -> React UI -> usePhysics hook -> Matter.js engine -> Canvas output
-Local user -> Socket.IO client -> Socket.IO server -> Other users
-Save experiment -> REST API -> MongoDB
-```
-
-### 21. Main Purpose
-VIRTUAL-LAB helps users understand mechanics by building experiments, running simulations, observing motion, editing physical properties, and analyzing graphs.
-
----
-
-
-
+### How It Works Under The Hood
+1. **Simulation:** The core loop bridges React state with the Matter.js engine. Objects drawn on the React canvas are translated into Matter.js rigid bodies.
+2. **Constraints:** Springs apply forces using Hooke's Law (`F = -k(x - L0)`), while ropes dynamically restrict distance without pushing when slack.
+3. **Collaboration:** Socket.IO synchronizes canvas events (object creation, dragging, properties updates) instantly across all clients in the same room.
+4. **Analytics:** While the simulation runs, body states (velocity, acceleration) are captured per frame. When paused, this data is rendered into interactive charts.
